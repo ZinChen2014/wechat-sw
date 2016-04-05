@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.desksoft.wechat.common.model.Payrecord;
 import com.desksoft.wechat.common.model.Refeeflow;
 import com.desksoft.wechat.common.model.Scoreflow;
@@ -14,6 +16,7 @@ import com.jfinal.json.Json;
 import com.jfinal.plugin.activerecord.Page;
 
 public class AdminUserController extends BaseController {
+	
 	
 	@ActionKey("/user/login")
 	public void login(){
