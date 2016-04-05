@@ -1,0 +1,18 @@
+package com.desksoft.wechat.controller;
+
+import com.jfinal.core.Controller;
+
+/**
+ * 微信消息服务处理
+ * @author Joker
+ *
+ */
+public class WechatMsgController extends BaseController {
+
+	/**
+	 * 消息入口
+	 */
+	public void index() {
+
+	}
+}

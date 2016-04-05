@@ -1,0 +1,10 @@
+package com.desksoft.wechat.common.model;
+
+import com.desksoft.wechat.common.model.base.BasePayrecord;
+
+@SuppressWarnings("serial")
+public class PayRecord extends BasePayrecord<PayRecord> {
+	
+	public static final PayRecord dao = new PayRecord();
+	
+}

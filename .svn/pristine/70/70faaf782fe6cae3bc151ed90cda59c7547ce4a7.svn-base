@@ -1,0 +1,228 @@
+package com.desksoft.wechat.service;
+
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.w3c.dom.Node;
+
+import com.desksoft.wechat.weixin.entity.GongjiaoBus;
+import com.desksoft.wechat.weixin.entity.Segment;
+import com.jfinal.kit.PropKit;
+import com.jfinal.weixin.sdk.kit.PaymentKit;
+import com.jfinal.weixin.sdk.kit.XmlKit;
+import com.jfinal.weixin.sdk.utils.HttpUtils;
+
+/**
+ * @author Joker
+ * 兴业银行 公众号支付调用接口
+ */
+public class XyBankPayService {
+	
+	//商户密钥 
+	String MerchantKey = "9d101c97133837e13dde2d32a5054abb";
+	
+	//获得token_ID url
+	private static String gatewayUrl = "https://pay.swiftpass.cn/pay/gateway";
+	
+	//支付URL
+	private static String jspayUrl = "https://pay.swiftpass.cn/pay/jspay";
+	
+	
+	public static String pushOrder(Map<String, String> params) {
+		return HttpUtils.post(gatewayUrl, PaymentKit.toXml(params));
+	}
+	
+	
+	public static String getNoticeUrl(){
+		String CONTEXT_PATH = "";
+		
+		String devType = PropKit.get("devType");
+		if(StringUtils.isBlank(devType)){
+			return CONTEXT_PATH;
+		}
+		if("dev".equalsIgnoreCase(devType))
+			CONTEXT_PATH = PropKit.get("CONTEXT_PATH_DEV");
+		else if("test".equalsIgnoreCase(devType))
+			CONTEXT_PATH = PropKit.get("CONTEXT_PATH_TEST");
+		else if("online".equalsIgnoreCase(devType))
+			CONTEXT_PATH = PropKit.get("CONTEXT_PATH_ONLINE");
+		
+		return CONTEXT_PATH;
+	}
+	
+	public static String formatTimeStamp(Date date){
+		SimpleDateFormat time=new SimpleDateFormat("yyyyMMddHHmmss"); 
+		System.out.println(time.format(date)); 
+		return time.format(date);
+	}
+	
+	
+	public static String getPayUri(String token_ID){
+		return jspayUrl+"?token_id="+token_ID+"&showwxtitle=1";
+	}
+    /*
+	 * @param inputStream
+	 * @return 解析好的签名数据
+	 *
+	 /*	*	public String signXml(InputStream inputStream){
+		String data = "";
+		  try {
+			  // 使用dom4j解析xml字符串
+			  SAXReader reader = new SAXReader();
+			  Document document = reader.read(inputStream);
+			  // 得到xml根元素
+			  Element root = document.getRootElement();
+			//  XmlKit.elementText(element, name)  
+			//  root.element("body")
+			return data;
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+	}*/
+	
+	
+	
+	private static List<GongjiaoBus> getGongjiaoBus(String city,String start_addr,String end_addr){
+		String requestUrl = "http://openapi.aibang.com/bus/transfer?app_key=0a64bf2d8ee2248700e8bc32e6aaa3fe&city={city}&start_addr={start_addr}&end_addr={end_addr}";
+	    // 对城市和线路进行编码
+	    requestUrl = requestUrl.replace("{city}", urlEncodeUTF8(city));
+	    requestUrl = requestUrl.replace("{start_addr}", urlEncodeUTF8(start_addr));
+	    requestUrl = requestUrl.replace("{end_addr}", urlEncodeUTF8(end_addr));
+	    // 处理名称、作者中间的空格
+	    requestUrl = requestUrl.replaceAll("\\+", "%20");
+	    System.out.println(requestUrl);
+	    InputStream inputStream=HttpUtils.download(requestUrl, null);
+//	    InputStream inputStream=HttpUtil.getInputStreamByGet(requestUrl);
+	    if (inputStream!=null) {
+	    	return parseGongjiaoBus(inputStream);
+		}
+		return null;
+		
+	}
+	@SuppressWarnings("unchecked")
+	private static List<GongjiaoBus> parseGongjiaoBus(InputStream inputStream) {
+		List<GongjiaoBus> gongjiaoBus=new ArrayList<GongjiaoBus>();
+	  try {
+		  // 使用dom4j解析xml字符串
+		  SAXReader reader = new SAXReader();
+		  Document document = reader.read(inputStream);
+		  // 得到xml根元素
+		  Element root = document.getRootElement();
+		  // result_num表示查询得公交路线数量
+		  String num = root.element("result_num").getText();
+		  if (!"0".equals(num)) {
+			  List<Element> buses = root.elements("buses");
+			  List<Element> bus = buses.get(0).elements("bus");
+		      for (int i = 0; i < bus.size(); i++) {
+		    	 Element item=bus.get(i);
+		    	 String dist=item.elementText("dist");
+		    	 String time=item.elementText("time");
+		    	 String foot_dist=item.elementText("foot_dist");
+		    	 String last_foot_dist=item.elementText("last_foot_dist");
+		    	 //乘车 考虑到换成
+		    	 Element segments =item.element("segments");
+		    	 List<Element> segment = segments.elements("segment");
+		    	 List<Segment> list=new ArrayList<Segment>();
+		    	 for (Element element : segment) {
+					String line_name=element.elementText("line_name");
+					String stats=element.elementText("stats");
+					String foot_dist2=element.elementText("foot_dist");
+					list.add(new Segment(line_name, stats, foot_dist2));
+				}
+		    	 gongjiaoBus.add(new GongjiaoBus(dist, time, foot_dist, last_foot_dist, list)); 
+			}
+		      
+		      return gongjiaoBus;
+		  }
+	} catch (DocumentException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	  return null;
+	}
+	
+	
+	public static String getgetGongjiaoBusSer(String city,String start_addr,String end_addr){
+		List<GongjiaoBus> bus= getGongjiaoBus(city, start_addr, end_addr);
+		StringBuffer buffer=new StringBuffer();
+		if (bus!=null) {
+			for (int i = 0; i < 5; i++) {
+				buffer.append("\ue132 方案"+(i+1)+"\n");
+				buffer.append("总距离："+bus.get(i).getDist()+"m 时间："+bus.get(i).getTime()+"分钟 ");
+				String foot=bus.get(i).getFoot_dist();
+				if (!foot.equals("0")) {
+					buffer.append("步行距离："+bus.get(i).getFoot_dist()+"m \n\n");
+				}else {
+					buffer.append("\n\n");
+				}
+				String last_foot_dist=bus.get(i).getLast_foot_dist();
+				if (!last_foot_dist.equals("0")) {
+					buffer.append("\ue231 先步行"+last_foot_dist+"m到公交站\n");
+				}
+				List<Segment> list=bus.get(i).getList();
+				for (int j = 0; j < list.size(); j++) {
+					String ch="乘";
+					if (j>0) {
+						ch="换乘";
+					}
+					buffer.append("\ue231"+ch+list.get(j).getLine_name().substring(0,list.get(j).getLine_name().indexOf("("))+",途径站点:"+list.get(j).getStats()+"\n");
+					String foot_dist=list.get(j).getFoot_dist();
+					if (!foot_dist.equals("0")) {
+						if (list.size()>j+1 && list.get(j+1).getLine_name()!=null) {
+							buffer.append("\ue231 再步行"+foot_dist+"m到达"+list.get(j+1).getLine_name());
+						}else {
+							buffer.append("\ue231 再步行"+foot_dist+"m到达"+end_addr);
+						}
+					}
+					buffer.append("\n\n");
+				}
+				
+			}
+			return buffer.toString();
+		}
+		return null;
+		
+	}
+	
+	/**
+	    * UTF-8编码
+	    *
+	    * @param source
+	    * @return
+	    */
+	  public static String urlEncodeUTF8(String source) {
+	    String result = source;
+	    try {
+	      result = java.net.URLEncoder.encode(source, "UTF-8");
+	    } catch (UnsupportedEncodingException e) {
+	      e.printStackTrace();
+	    }
+	    return result;
+	  }
+	
+	public static void main(String[] args) {
+		String xmlString = "<xml><body><![CDATA[测试支付]]></body><mch_create_ip><![CDATA[127.0.0.1]]></mch_create_ip><mch_id><![CDATA[001075552110006]]></mch_id>"
+							+"<nonce_str><![CDATA[1409196838]]></nonce_str>"
+							+"<notify_url><![CDATA[http://227.0.0.1:9001/javak/sds?123&23=3]]></notify_url>"
+							+"<out_trade_no><![CDATA[141903606228]]></out_trade_no>"
+							+"<service><![CDATA[pay.weixin.jspay]]></service>"
+							+"<sign><![CDATA[83684D9546F261997EFF2ECFAC372583]]></sign>"
+							+"<total_fee><![CDATA[1]]></total_fee>"
+							+"</xml>";
+		Node document =  XmlKit.parse(xmlString);
+		String body = XmlKit.documentText((org.w3c.dom.Document) document, "body"); 
+			 System.out.println(body);
+	}
+	
+	
+}

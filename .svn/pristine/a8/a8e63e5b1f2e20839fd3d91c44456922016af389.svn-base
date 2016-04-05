@@ -1,0 +1,84 @@
+package com.desksoft.wechat.common.model;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.List;
+
+import com.desksoft.wechat.common.model.base.BasePayrecord;
+import com.jfinal.plugin.activerecord.Page;
+
+@SuppressWarnings("serial")
+public class PayRecord extends BasePayrecord<PayRecord> {
+	
+	public static final PayRecord dao = new PayRecord();
+	
+	
+	/**
+	 * @param type 类型 缴费1A/预存2B
+	 * @param openId 微信号
+	 * @param userNo 户号
+	 * @param fee 金额
+	 * @param userid 用户表ID 
+	 * @param remark 账单号 A/B+日期+“-”+卡号
+	 * @return Boolean 是否插入成功
+	 */
+	public boolean addPayRecord(int type,String openId,String userNo,int fee,int userid,String remark,int num){
+		
+		boolean flag = dao.set("type", type)
+		.set("openId", openId).set("userNo", userNo)
+		.set("fee", fee).set("userid", userid)
+		.set("remark", remark).set("isDelete", 1)
+		.set("realNumber", num)
+		.set("isChk", 0).set("updateTime", new Date())
+		.set("createTime", new Date())
+		.save();
+		return flag;
+	}
+	
+	
+	public Page<PayRecord> getPayRecordPaginateList(int pageNumber, int pageSize,Date startDate,Date endDate,int userNo) {
+		String SQL = "from PayRecord where isdelete = 1 ";
+		if(startDate!=null){
+			SQL += " and createTime > '" + DateFormat.getDateInstance().format(startDate)+"'" ;
+		}
+		if(endDate!=null){
+			SQL += " and createTime < '" + DateFormat.getDateInstance().format(endDate) +"'" ;
+		}
+		if(userNo>0){
+			SQL += " and userNo =" + userNo  ;
+		}
+		SQL +=" order by id asc";
+		return paginate(pageNumber, pageSize, "select *", SQL);
+	}
+	
+	public List<PayRecord> getPayRecordListById(int type){
+		return getPayRecordListById(0,type);
+	}
+	
+	/**
+	 * @param id
+	 * @return List<PayRecord>
+	 *  前一天的所有信息
+	 */
+	public List<PayRecord> getPayRecordListById(int miniID,int type){
+		return getPayRecordListById(miniID,type,0,10);
+	}
+	
+	/**
+	 * @param miniID
+	 * @param index
+	 * @param num
+	 * @return   前一天的所有信息
+	 */
+	public List<PayRecord> getPayRecordListById(int miniID,int index,int num,int type){
+		//查询前一天where id > ? and 	limit ?,?,index,num
+		 String sql = "select * from PayRecord  where date(createTime)=curdate()-INTERVAL 1 day and isChk=0 and remark is not null and type=? "; 
+		 List<PayRecord> list = dao.find(sql,type);
+		 return list;
+	}
+	
+	public PayRecord getPayRecordByRemark(String remark){
+		return dao.findFirst("select * from PayRecord where remark = ? ", remark);
+	}
+	
+}

@@ -1,0 +1,29 @@
+package com.desksoft.wechat.common.model;
+
+import java.text.DateFormat;
+import java.util.Date;
+
+import com.desksoft.wechat.common.model.base.BasePayrecord;
+import com.jfinal.plugin.activerecord.Page;
+
+@SuppressWarnings("serial")
+public class PayRecord extends BasePayrecord<PayRecord> {
+	
+	public static final PayRecord dao = new PayRecord();
+	
+	public Page<PayRecord> getPayRecordPaginateList(int pageNumber, int pageSize,Date startDate,Date endDate,int userNo) {
+		String SQL = "from PayRecord where isdelete = 1 ";
+		if(startDate!=null){
+			SQL += " and createTime > '" + DateFormat.getDateInstance().format(startDate)+"'" ;
+		}
+		if(endDate!=null){
+			SQL += " and createTime < '" + DateFormat.getDateInstance().format(endDate) +"'" ;
+		}
+		if(userNo>0){
+			SQL += " and userNo =" + userNo  ;
+		}
+		SQL +=" order by id asc";
+		return paginate(pageNumber, pageSize, "select *", SQL);
+	}
+	
+}

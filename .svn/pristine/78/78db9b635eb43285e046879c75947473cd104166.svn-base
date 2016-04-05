@@ -1,0 +1,4 @@
+DailyCheckJob.job=com.desksoft.wechat.common.plugin.DailyCheckJob 
+#每天23:30触发 0 30 23 * * ?
+DailyCheckJob.cron=*/5 * * * * ?
+DailyCheckJob.enable=true

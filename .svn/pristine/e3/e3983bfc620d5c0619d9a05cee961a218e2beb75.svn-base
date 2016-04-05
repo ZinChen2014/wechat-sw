@@ -1,0 +1,10 @@
+package com.desksoft.wechat.common.model;
+
+import com.desksoft.wechat.common.model.base.BaseRefeeflow;
+
+@SuppressWarnings("serial")
+public class RefeeFlow extends BaseRefeeflow<RefeeFlow> {
+	
+	public static final RefeeFlow dao = new RefeeFlow();
+	
+}

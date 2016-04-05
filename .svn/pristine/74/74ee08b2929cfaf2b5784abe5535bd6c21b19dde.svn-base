@@ -1,0 +1,186 @@
+package com.desksoft.wechat.controller.bindingUser;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.desksoft.wechat.common.model.User;
+import com.desksoft.wechat.common.model.UserBindFlow;
+import com.desksoft.wechat.controller.admin.BaseController;
+import com.desksoft.wechat.service.YouPuSocketService;
+import com.jfinal.kit.StrKit;
+
+public class BindingUserController extends BaseController {
+	
+	/**
+	 * 解绑单个
+	 */
+	public void unbindSingle(){
+		String type = getPara(0);		
+		if ("json".equals(type)) {
+			Map<String,Object> map = new HashMap<String,Object>();
+			String openID = getPara("openId").trim();
+			boolean bflag = UserBindFlow.me.unbindSingleUser(openID,getParaToInt("userno"));
+			if(bflag){
+				map.put("flag", true);
+			}else{
+				map.put("flag", false);
+			}
+	        // 跳转到前台发起请求的路径
+	        renderJson(map);
+		}else{
+			renderText("非法URL");
+		}
+	}
+	
+	
+	
+	/**
+	 * 加载解绑列表
+	 */
+	public void unbindUser(){
+		String openId = getPara("openId",null);
+		if(StringUtils.isNotBlank(openId)){
+			List<UserBindFlow> list = UserBindFlow.me.selectBindingUserList(openId);
+			if(list.size()>0){
+				setAttr("objList", list);
+				render("unbind.html");
+			}else{
+				render("addUser.html");
+			}
+				
+		}else{
+			renderText("非法URL");
+		}
+		
+	}
+	
+	/**
+	 * 绑定用户信息3
+	 */
+	public void bind(){
+		String type = getPara(0);		
+		if ("json".equals(type)) {
+			Map<String,Object> map = new HashMap<String,Object>();
+			String openID = getPara("openId").trim();
+			String mobileno = getPara("mobileno").trim();
+			boolean bflag = UserBindFlow.me.addBindUser(openID,getParaToInt("userno"),mobileno,getPara("address"),getPara("userName"));
+			boolean uflag = User.dao.addMsgUser(openID);
+			//TODO 如果获得推荐人的openID ,推荐人记录茶如一条记录，推荐人 积分记录添加一条，User表推荐人增加积分
+			if(bflag&&uflag){
+				map.put("flag", true);
+			}else{
+				map.put("flag", false);
+				map.put("msg", "信息绑定失败");
+			}
+			
+	        // 跳转到前台发起请求的路径
+	        renderJson(map);
+		}else{
+			renderText("非法URL");
+		}
+	}
+	
+	/**
+	 * 加载用户信息2
+	 */
+	public void toBind(){
+		String type = getPara(0);		
+		if ("json".equals(type)) {
+			Map<String,Object> map = new HashMap<String,Object>();
+			String userno = getPara("userno");
+			boolean flag = true;
+			if(StrKit.notBlank(userno)){
+				String temp = YouPuSocketService.getUserInfoData(userno);
+				String[] temps = temp.split(",");
+				
+				//响应码
+				String ReturnCode  = temps[0].substring(42, 43);
+				if(!"00".equals(ReturnCode )){
+					flag = false;
+				}
+			}
+			
+			 //TODO 调用 水务接口，判断是否有效的户号userno
+			 // flag 成功则获得绑定户号的信息，
+			 // 失败
+			//返回的是一个String  F|描述|客户号|客户名称|客户地址|预存款|DATA1| DATA2|…|DATAn
+			/*调用函数：GetUserInfo,输入参数：hh  hh[客户号]为Int型
+			返    回：F|描述|客户号|客户名称|客户地址|预存款|DATA1| DATA2|…|DATAn
+			说    明：
+			标志位：F
+			0：操作成功；
+			90：该客户号不存在；
+			Data1..Datan为表卡信息,格式为：表卡ID|卡号|开票名称|…：*/
+
+			//String backString = "0|这是一个老实人|2015121388|张三丰|北京市朝阳区8大胡同365号|180元|DATA1| DATA2|…|DATAn";
+			
+			if(flag){
+				//TODO 组装成List<bean>,返回给页面
+				//setAttr("jsonList", List<bean>);
+				//String userName = 
+			
+				map.put("userName", "张三");
+				map.put("address", "北极干尸三元里");
+				Map<String,String> wtMap = new HashMap<String,String>();
+				wtMap.put("wtNo", "241547635");
+				wtMap.put("wtName", "新丰村表");
+				wtMap.put("wtAddress", "地址是遥远的北方");
+				Map<String,String> wtMap2 = new HashMap<String,String>();
+				wtMap2.put("wtNo", "141547635");
+				wtMap2.put("wtName", "新丰村表2");
+				wtMap2.put("wtAddress", "地址是遥远的北方2");
+				List<Map<String,String>> list = new ArrayList<Map<String,String>>();
+				list.add(wtMap);
+				list.add(wtMap2);
+				map.put("wtList", list);
+				// TODO 推荐人这一块以后可能需要
+				Map<String,String> refeer = new HashMap<String,String>();
+				refeer.put("openID", "141547635");
+				refeer.put("nicName", "犯二小子");
+				
+				
+				String openID = getPara("openId").trim();
+				map.put("userno", userno);
+				map.put("openID", openID);
+				map.put("phoneNum", getPara("mobileno"));
+				setAttr("attrObj", map);
+			}
+	        render("confirmUser.html");
+		}else{
+			renderText("非法URL");
+		}
+	}
+	
+	
+	/**
+	 * 判断户号是否存在1
+	 */
+	public void isExstBind(){
+		String type = getPara(0);		
+		if ("json".equals(type)) {
+			Map<String,Object> map = new HashMap<String,Object>();
+			int userno =getParaToInt("userno");
+			/**
+			 * @TODO调用 水务接口，判断是否有效的户号userno
+			 * flag 成功则获得绑定户号的信息，组装成List<bean>,返回给页面，有页面设置成cookie
+			 * 失败
+			 */
+			boolean flag = true;
+			if(flag){
+				map.put("flag", true);
+			}else{
+				map.put("flag", false);
+				map.put("msg", "用户不存在");
+			}
+	        // 跳转到前台发起请求的路径
+	        renderJson(map);
+		}else{
+			renderText("非法URL");
+		}
+	}
+	
+}

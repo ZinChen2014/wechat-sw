@@ -1,0 +1,30 @@
+package com.desksoft.wechat.common.model;
+
+import java.text.DateFormat;
+import java.util.Date;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.desksoft.wechat.common.model.base.BaseRefeeflow;
+import com.jfinal.plugin.activerecord.Page;
+
+@SuppressWarnings("serial")
+public class ScoreFlow extends BaseRefeeflow<ScoreFlow> {
+	
+	public static final ScoreFlow dao = new ScoreFlow();
+	
+	public Page<ScoreFlow> getScoreFlowPaginateList(int pageNumber, int pageSize,Date startDate,Date endDate,String openID) {
+		String SQL = "from scoreflow where isdelete = 1 ";
+		if(startDate!=null){
+			SQL += " and createTime > '" + DateFormat.getDateInstance().format(startDate)+"'" ;
+		}
+		if(endDate!=null){
+			SQL += " and createTime < '" + DateFormat.getDateInstance().format(endDate) +"'" ;
+		}
+		if(StringUtils.isNotBlank(openID)&&!("default".equalsIgnoreCase(openID))){
+			SQL += " and openID like '%" + openID + "%'" ;
+		}
+		SQL +=" order by id asc";
+		return paginate(pageNumber, pageSize, "select *", SQL);
+	}
+}

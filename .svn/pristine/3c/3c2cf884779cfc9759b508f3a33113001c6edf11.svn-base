@@ -1,0 +1,131 @@
+package com.desksoft.wechat.common.model;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.desksoft.wechat.common.model.base.BaseUserbindflow;
+import com.jfinal.plugin.activerecord.Page;
+
+@SuppressWarnings("serial")
+public class UserBindFlow extends BaseUserbindflow<UserBindFlow> {
+	
+	public static final UserBindFlow me = new UserBindFlow();
+	public static final int IS_DELETE_NO = 0;
+	
+	public Page<UserBindFlow> getBindingUserPaginateList(int pageNumber, int pageSize,Date startDate,Date endDate,int userNo) {
+		String SQL = "from UserBindFlow where isdelete = 1 ";
+		if(startDate!=null){
+			SQL += " and createTime > '" + DateFormat.getDateInstance().format(startDate)+"'" ;
+		}
+		if(endDate!=null){
+			SQL += " and createTime < '" + DateFormat.getDateInstance().format(endDate) +"'" ;
+		}
+		if(userNo>0){
+			SQL += " and userNo =" + userNo  ;
+		}
+		SQL +=" order by id asc";
+		return paginate(pageNumber, pageSize, "select *", SQL);
+	}
+	
+	public boolean delBindingUser(Object idValue){
+		return me.findById(idValue).set("isDelete", IS_DELETE_NO).update();
+	}
+	
+	public boolean isBindingUser(String openid){
+		if(StringUtils.isNotBlank(openid)){
+			List<UserBindFlow> list = selectBindingUserList(openid);
+			if(list.size()>0){
+				return true;
+			}
+		}	
+		return false;
+	}
+	
+	/**
+	 * 该微信号绑定的有效户号
+	 * @param openid
+	 * @return
+	 */
+	public List<UserBindFlow> selectBindingUserList(String openid){
+		List<UserBindFlow> list = me.find("select * from UserBindFlow where openID=? and isdelete=1 and isBinding=1", openid);
+		return list;
+	}
+	
+	/**
+	 * 微信端添加绑定记录
+	 * @param openID
+	 * @param userNo
+	 * @param mobileno
+	 * @return
+	 */
+	public boolean addBindUser(String openID,Integer userNo,String mobileno,String address,String userName){
+		boolean flag = true;
+		UserBindFlow exis = me.findFirst("select * from UserBindFlow where openid=? and userNo=?", openID, userNo );
+		if(exis==null){
+			flag = new UserBindFlow().set("openID",openID).
+					set("userNo", userNo). 
+					set("phoneNum", mobileno).
+					set("address", address). 
+					set("userName", userName).
+					set("createTime", new Date()).
+					set("updateTime", new Date()).save();
+		}else{
+			if(0==exis.getIsBinding()||0==exis.getIsDelete()){
+				flag = exis.set("isBinding", 1).set("isdelete", 1).update();
+			}
+		}
+		return flag;
+		
+	}
+	
+	/**
+	 * 解除绑定
+	 * @param openId
+	 * @param userNo
+	 * @return
+	 */
+	public boolean unbindSingleUser(String openId,Integer userNo){
+		boolean flag = true;
+		UserBindFlow exis = me.findFirst("select * from UserBindFlow where openid=? and userNo=?", openId, userNo );
+		if(exis!=null){
+			flag = exis.set("isBinding", 0).update();
+		}
+		return flag;
+	}
+	
+	/**
+	 * @param id
+	 * @return List<UserBindFlow>
+	 *  获得所有绑定的(户号) 关注的(微信号) 未删除的 
+	 */
+	public List<UserBindFlow> getUserBindFlowListById(){
+		return getUserBindFlowListById(0);
+	}
+	
+	/**
+	 * @param id
+	 * @return List<UserBindFlow>
+	 *  获得所有绑定的(户号) 关注的(微信号) 未删除的 
+	 */
+	public List<UserBindFlow> getUserBindFlowListById(int miniID){
+		return getUserBindFlowListById(miniID,0,10);
+	}
+	
+	/**
+	 * @param miniID
+	 * @param index
+	 * @param num
+	 * @return   获得所有绑定的(户号) 关注的(微信号) 未删除的 
+	 */
+	public List<UserBindFlow> getUserBindFlowListById(int miniID,int index,int num){
+		//查询前一天	
+		 String sql = "select * from UserBindFlow where isFollow=1 and isdelete=1 and isBinding=1 and id > ? limit ?,?"; 
+		 List<UserBindFlow> list = me.find(sql,miniID,index,num);
+		 return list;
+	}
+	
+	
+}

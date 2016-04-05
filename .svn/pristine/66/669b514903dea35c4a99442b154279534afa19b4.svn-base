@@ -1,0 +1,74 @@
+<#include "/pages/common/_layoutForMsg.html"/>
+<@layout>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="/../../js/weixin/confirmUser.js"></script>
+<title>户号绑定</title>
+</head>
+<body>
+<form id="form1" action="" method="post">
+<div style="margin:5px;">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <ul class="nav nav-pills nav-justified">
+                <li>户号绑定</li>
+            </ul>
+       </div>
+       
+		<div class="scuess" style="display: none; margin-left: 5%;">
+			<h2
+				style="height: 44px; line-height: 44px; font-size: 22px; color: #fb9b00;">绑定成功！</h2>
+			<p
+				style="text-align: left; padding-top: 30px; color: #339502; font-size: 18px;">恭喜您绑定成功!</p>
+			<p>说明:&nbsp;&nbsp;手机号码是您在我司营业MIS系统中登记的联系手机号码，如需登记或更改，请致电我司客户服务热线83295806</p>
+		</div>
+		
+		<div class="panel-body">            
+            <table class="table-bordered table-condensed" style="padding:5px ;text-align:center;" width="100%">
+            
+                <tr>
+                    <td class="bgcolor" width="20%">户号</td>
+                    <td width="30%" >${attrObj.userno}&nbsp;</td>
+                    <td class="bgcolor" width="20%">户名</td>
+                    <td width="30%" >${attrObj.userName}&nbsp;</td>
+                </tr>
+                <tr>
+                    <td class="bgcolor" >地址</td>
+                    <td colspan="3" >${attrObj.address}</td>
+                </tr>
+                <tr><td class="bgcolor">水表卡号</td>
+                    <td class="bgcolor">开票名称</td>
+                    <td class="bgcolor" colspan="2" >装表地址</td>
+                </tr>
+                <#list attrObj.wtList as wt>	
+                <tr><td>${wt.wtNo}</td>
+                    <td>${wt.wtName}</td>
+                    <td colspan="2" >${wt.wtAddress}</td>
+                </tr>
+                </#list>
+               <#--  <tr>
+                    <td class="bgcolor">推荐人</td>
+                    <td colspan="3" >${attrObj.refeer.nicName}</td>
+                </tr>  -->  
+                <tr>
+                    <td colspan="4" align="center">
+                        <input id="iok" name="iok" type="checkbox" value="1" style="height:12px"><label for="iok">本人已阅读以上条款并同意条款内容</label>
+                    </td>
+                </tr>
+            </table>            
+        </div>
+         <input type="hidden" id="address" value="${attrObj.address}"/>
+          <input type="hidden" id="userName" value="${attrObj.userName}"/>
+        <input type="hidden" id="userno" value="${attrObj.userno}"/>
+		<input type="hidden" id="openId" value="${attrObj.openID}"/>
+		<input type="hidden" id="phoneNum" value="${attrObj.phoneNum}"/>
+	<#-- 	<input type="hidden" id="inmoney" value="${attrObj.refeer.openID}"/> -->
+        <div class="panel-body">
+            <div class="list-group" style="text-align:center;">
+                <a href="javascript:void(0)" id="fsubmit" class="list-group-item bgcolor" style="display:none;">绑定户号</a>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+</@layout>

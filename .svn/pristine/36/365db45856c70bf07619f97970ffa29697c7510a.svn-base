@@ -1,0 +1,33 @@
+package com.desksoft.wechat.controller.user;
+
+import com.desksoft.wechat.common.model.User;
+import com.desksoft.wechat.common.model.UserBindFlow;
+import com.desksoft.wechat.controller.BaseController;
+import com.jfinal.aop.Before;
+import com.jfinal.core.ActionKey;
+
+public class UserController extends BaseController {
+	
+	@Before(UserValidator.class)
+	public void login(){
+		String username = getPara("username");
+        String password = getPara("password");
+        boolean loginCheck = User.dao.checkLogin(username,password);
+        if(loginCheck){
+            getSession().setAttribute("onlineUser",User.dao.getUserByUserName(username));
+        }
+	}
+	
+	@ActionKey("/user/getBindingUserList")
+	public void getBindingUserList(){
+		setAttr("bindingUserPage", UserBindFlow.me.getBindingUserPaginateList(getParaToInt(0, 1), 10));
+		render("bindingUserPageList.html");
+	}
+	
+	@ActionKey("/user/delBindingUser")
+	public void delBindingUser() {
+		UserBindFlow.me.delBindingUser(getParaToInt());
+		redirect("/user/getBindingUserList");
+	}
+	
+}

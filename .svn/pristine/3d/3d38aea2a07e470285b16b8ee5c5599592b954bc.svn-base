@@ -1,0 +1,25 @@
+package com.desksoft.wechat.controller.user;
+
+import com.desksoft.wechat.common.model.User;
+import com.jfinal.core.Controller;
+import com.jfinal.validate.Validator;
+
+public class UserValidator extends Validator {
+
+	@Override
+	protected void validate(Controller c) {
+		validateRequiredString("user.username", "titleMsg", "请输入Blog标题!");
+		validateRequiredString("blog.password", "contentMsg", "请输入Blog内容!");
+
+	}
+
+	@Override
+	protected void handleError(Controller c) {
+		controller.keepModel(User.class);
+		String actionKey = getActionKey();
+		if (actionKey.equals("/user/save"))
+			controller.render("index.html");
+
+	}
+
+}

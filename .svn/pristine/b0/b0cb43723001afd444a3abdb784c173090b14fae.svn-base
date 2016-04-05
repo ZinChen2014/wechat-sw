@@ -1,0 +1,52 @@
+package com.desksoft.wechat.controller.bindingUser;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import com.desksoft.wechat.common.model.User;
+import com.desksoft.wechat.controller.BaseController;
+import com.desksoft.wechat.service.LargeMsgService;
+import com.desksoft.wechat.weixin.template.DataItem;
+
+/**
+ * 后台控制 点击按钮 发送 停水信息 ，给所有的绑定用户
+ * @author Joker
+ *
+ */
+public class SendShutWaterInfoInfoController extends BaseController {
+	
+	private static Logger log = Logger.getLogger(SendShutWaterInfoInfoController.class);
+	
+	//停水模板ID
+	private static final String moudleId="BfkzuC__ueuJkF84cPup-27OnSlq1fYrDUFBdmBU2uY";
+	
+	public void index(){
+		
+		User loginUser = getOnLineUser();
+		if(loginUser==null){
+			log.debug("非登录人员后台操作，当前没有登录用户");
+			renderText("非法操作");
+		}
+		//Map<String,Object> map = new HashMap<String,Object>();
+		//获取分批所有的绑定自来水户号的且关注微信的用户，分别给他们微信号发送
+		//停水消息
+		String  keyword = getPara("keyword1"); 
+		
+		DataItem  dataItem =LargeMsgService.getShutOffWaterMudle(getPara("keyword1"),getPara("keyword2"),getPara("keyword3"),getPara("remark"));
+		Map<String,Object> map= LargeMsgService.WaterShutoffNotic(dataItem,moudleId);
+		
+	}
+	
+	
+	
+	
+	/**
+	 * 进入 ---编辑停水消息模板
+	 */
+	public void editShutOffWaterInfo(){
+		render("editShutOffWaterInfo.html");
+	}
+	
+}

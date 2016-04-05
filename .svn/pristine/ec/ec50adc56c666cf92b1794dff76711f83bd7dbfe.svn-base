@@ -1,0 +1,142 @@
+<#include "/pages/common/_layoutForMsg.html"/>
+<@layout>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="/../../js/weixin/payWater.js"></script>
+<title>立即缴费</title>
+</head>
+<body>
+<#-- <input type="hidden" id="openId" value="${openID}"> -->
+
+	<div style="margin:5px;">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<ul class="nav nav-pills nav-justified">
+					<li>立即缴费</li>
+				</ul>
+			</div>
+			<div class="panel-body">
+			 <#list objList as obj>
+ 		<#if obj_index<1>
+				<table indexlist="${obj_index}" indexall="${objList?size}" class="list${obj_index} table-bordered table-condensed" style="padding:5px;text-align:center;" width="100%">
+				<tbody>
+					<tr>
+						<td class="bgcolor" width="30%">客户号</td>
+						<td width="40%" colspan="2">${obj.userBindFlow.userNo}&nbsp;</td>
+						<td  class="list-group" width="30%">
+							<a  class="list-group-item bgcolor next_shuibiao" >下一个客户号</a>
+						</td>
+					</tr>
+					<tr>
+						<td class="bgcolor">户名</td>
+						<td  colspan="3">${obj.userBindFlow.userName}&nbsp;</td>
+					</tr>
+					
+					<tr>
+						<td class="bgcolor">地址</td>
+						<td colspan="3" >${obj.userBindFlow.address}</td>
+					</tr>	
+					<#if obj.status==1>
+					<tr>
+						<td colspan="4" >您暂无欠费</td>
+					</tr>
+					<#elseif obj.status==-1>
+					<tr>
+						<td colspan="4" >查询失败</td>
+					</tr>
+					<#else>
+					<tr>
+						<td colspan="4" >以下是您的欠费情况</td>
+					</tr>
+					<tr>
+						<td class="bgcolor">笔数</td>
+						<td>${obj.wtMap.num?default(0)}</td>
+						<td class="bgcolor" width="10%">水费</td>
+						<td>${obj.wtMap.waterFee?default(0)}</td>
+					</tr>
+					<tr>
+						<td class="bgcolor">违约金</td>
+						<td>${obj.wtMap.fund?default(0)}</td>
+						<td class="bgcolor">总金额</td>
+						<td>${obj.wtMap.total?default(0)}</td>
+					</tr>
+					<tr>
+						<td colspan="4">	
+							<#if obj.status!=1>
+							<div class="panel-body">
+										<div class="list-group" style="text-align: center;">
+											<a href="javascript:void(0)" class="list-group-item bgcolor" onclick="callpay('${obj.userBindFlow.userNo}','${obj.wtMap.total}','${obj.wtMap.num?default(0)}')">立即支付</a>
+										</div>
+							</div>
+							</#if>
+						</td>	
+					</tr>
+					</#if>
+					
+					</tbody>
+					
+				</table>
+				
+	<#else>
+	
+						<table  indexlist="${obj_index}" indexall="${objList?size}" class="list${obj_index} table-bordered table-condensed" style="padding:5px;text-align:center; display:none;" width="100%" >
+				<tbody>
+					<tr>
+						<td class="bgcolor" width="30%">客户号</td>
+						<td width="40%" colspan="2">${obj.userBindFlow.userNo}&nbsp;</td>
+						<td  class="list-group" width="30%">
+							<a  class="list-group-item bgcolor next_shuibiao" >下一个客户号</a>
+						</td>
+					</tr>
+					<tr>
+						<td class="bgcolor">户名</td>
+						<td  colspan="3">${obj.userBindFlow.userName}&nbsp;</td>
+					</tr>
+					
+					<tr>
+						<td class="bgcolor">地址</td>
+						<td colspan="3" >${obj.userBindFlow.address}</td>
+					</tr>	
+					<#if obj.status==1>
+					<tr>
+						<td colspan="4" >您暂无欠费</td>
+					</tr>
+					<#elseif obj.status==-1>
+					<tr>
+						<td colspan="4" >查询失败</td>
+					</tr>
+					<#else>
+					<tr>
+						<td colspan="4" >以下是您的欠费情况</td>
+					</tr>
+					<tr>
+						<td class="bgcolor">笔数</td>
+						<td>${obj.wtMap.num?default(0)}</td>
+						<td class="bgcolor" width="10%">水费</td>
+						<td>${obj.wtMap.waterFee?default(0)}</td>
+					</tr>
+					<tr>
+						<td class="bgcolor">违约金</td>
+						<td>${obj.wtMap.fund?default(0)}</td>
+						<td class="bgcolor">总金额</td>
+						<td>${obj.wtMap.total?default(0)}</td>
+					</tr>
+					<td colspan="4">	
+							<#if obj.status!=1>
+							<div class="panel-body">
+										<div class="list-group" style="text-align: center;">
+											<a href="javascript:void(0)" class="list-group-item bgcolor" onclick="callpay('${obj.userBindFlow.userNo}','${obj.wtMap.total}','${obj.wtMap.num?default(0)}')">立即支付</a>
+										</div>
+							</div>
+							</#if>
+						</td>	
+					</#if>
+				</tbody>
+				</table>
+				
+			</#if>
+	 </#list>	
+			</div>
+			
+		</div>
+	</div>
+</@layout>
