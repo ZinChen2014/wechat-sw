@@ -1,0 +1,53 @@
+<!DOCTYPE html><html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<link href="/../../css/bootstrap.min.css" rel="stylesheet">
+<script src="/../../js/jquery.min.js"></script>
+<script src="/../../js/bootstrap.min.js"></script>
+<script src="/../../js/weixin/clientUtil.js"></script>
+<script src="/../../js/weixin/addUserMsg.js"></script>
+<link rel="stylesheet" href="/../../css/style1.css">
+<title>户号绑定</title>
+</head>
+<body>
+<form id="form1" action="" method="post">
+<div style="margin:5px;">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <ul class="nav nav-pills nav-justified">
+                <li>户号绑定</li>
+            </ul>
+        </div>
+        <div class="panel-body">            
+            <table class="table-bordered table-condensed" style="padding:5px ;text-align:center;" width="100%">
+                <tr>
+                    <td class="bgcolor">用户水号</td>
+                    <td><input id="userno" placeholder="请输入用户水号" style="width:100%" onblur="check_login(this)"></td>
+                </tr>
+                <tr>
+                    <td class="bgcolor">手机号码</td>
+                    <td><input id="mobileno" placeholder="请输入手机号码" style="width:100%"  onblur="check_login(this)"></td>
+                </tr>    
+                
+            </table>  
+            <span id="err" style="color:red"><br><br></span>          
+        </div>
+        <div class="panel-body">
+            <div class="list-group" style="text-align:center;">
+                <a href="javascript:void(0)" id="fsubmit" class="list-group-item bgcolor">查询户号</a>
+            </div>
+        </div>
+        <p style="font-size:12px;">说明:&nbsp;&nbsp;手机号码是您在我司营业MIS系统中登记的联系手机号码，如需登记或更改，请致电我司客户服务热线83295806</p>
+    </div>
+
+</div>
+</form>
+<footer>
+    <p>技术支持:杭州微融互联科技有限公司</p>
+</footer>
+<script type="text/javascript">
+
+        
+</script>
+
+</body></html>

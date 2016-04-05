@@ -1,0 +1,66 @@
+<#include "/pages/common/_layout.html"/>
+<@layout>
+<title>停水消息编辑</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+ <script type="text/javascript">
+</script>
+<script src="${CONTEXT_PATH}/js/regularExpressionCommon.js"></script>
+   <script src="${CONTEXT_PATH}/js/user/editShutOffWaterInfo.js"></script>
+
+  <!-- content start -->
+    <div class="am-cf am-padding">
+      <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">停水通知</strong> / <small>编辑</small></div>
+    </div>
+
+    <hr/>
+
+    <div class="am-g">
+
+      <div class="am-u-sm-12 am-u-md-4 am-u-md-push-8">
+     
+      </div>
+
+      <div class="am-u-sm-12 am-u-md-8 am-u-md-pull-4">
+        <form class="am-form am-form-horizontal">
+          <div class="am-form-group">
+            <label for="user-name" class="am-u-sm-3 am-form-label">停水类型: </label>
+            <div class="am-u-sm-9">
+              <input type="text"  id="keyword1" value="" placeholder="停水类型 / keyword1">
+               <small>示例:计划检修</small> 
+            </div>
+          </div>
+
+          <div class="am-form-group">
+            <label for="user-password" class="am-u-sm-3 am-form-label">停水时间: </label>
+            <div class="am-u-sm-9">
+              <input type="text"  id="keyword2" placeholder="输入停水时间范围 / keyword2">
+              <small>示例:2014年8月29日8:00-18:00</small>
+            </div>
+          </div>
+
+           <div class="am-form-group">
+            <label for="user-password" class="am-u-sm-3 am-form-label">停水区域 :</label>
+            <div class="am-u-sm-9">
+              <input type="text" id="keyword3" placeholder="输入停水区域 / keyword3">
+               <small>示例:安源区步行街、北桥、万龙湾</small>
+            </div>
+          </div>
+
+         <div class="am-form-group">
+            <label for="user-intro" class="am-u-sm-3 am-form-label">附加信息:</label>
+            <div class="am-u-sm-9">
+              <textarea class="" rows="5" id="remark" placeholder="输入你需要补充说明的信息 / remark"></textarea>
+               <small>示例: 因为城区道路改造需要对自来水供水管路进行停水履行，给您带来不便敬请谅解。市政公告。</small>
+            </div>
+          </div>
+
+          <div class="am-form-group">
+            <div class="am-u-sm-9 am-u-sm-push-3">
+              <button type="button" class="am-btn am-btn-primary" id="submit">保存修改</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+</@layout>

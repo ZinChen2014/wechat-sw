@@ -1,0 +1,24 @@
+package com.desksoft.wechat.controller;
+
+import com.jfinal.core.ActionKey;
+
+
+//@Before(IocInterceptor.class)
+public class IndexController extends BaseController {
+
+
+
+	@ActionKey("/index")
+	public void index() {
+		render("index.html");
+	}
+
+	@ActionKey("/index/login")
+	public void login(){
+		
+		render("login.html");
+	}
+	
+	
+	
+}

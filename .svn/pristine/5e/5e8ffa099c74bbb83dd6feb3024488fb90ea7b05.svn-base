@@ -1,0 +1,128 @@
+<#include "/pages/common/_layoutForMsg.html"/>
+<@layout>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script src="/../../js/weixin/myUsedWater.js"></script>
+<title>我的用水</title>
+</head>
+
+<body>
+<div class="main">
+ <#list objList as obj>
+ 	<#if obj_index<1>
+	<table border="1" class="list${obj_index}" indexlist="${obj_index}" indexall="${objList?size}">
+		<tr>
+			<td colspan="2" bgcolor="#D9D9D9">户号</td>
+			<td colspan="2">${obj.userBindFlow.userNo}</td>
+			<td bgcolor="#D9D9D9">水表卡号</td>
+			<td></td>
+			<td colspan="2"><a  class="next_shuibiao">下一个水表</a></td>
+		</tr>
+		<tr>
+			<td colspan="2" bgcolor="#D9D9D9">户名</td>
+			<td colspan="4">${obj.userBindFlow.userName}</td>
+			<td bgcolor="#D9D9D9">预存款</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td colspan="2" bgcolor="#D9D9D9">地址</td>
+			<td colspan="6" >${obj.userBindFlow.address}</td>
+		</tr>		
+		<#list obj.usedList as useObj>
+		<tr class="trh trbg">
+			<td >月份</td>
+			<td >上期数</td>
+			<td >本期数</td>
+			<td >实抄数</td>
+			<td >应收数</td>
+			<td >金额</td>
+			<td >违约金</td>
+			<td >缴费否</td>
+		</tr>
+		<#if useObj.isPay=="1" || useObj.isPay== 1 >
+		<tr class="trh">
+			<td >${useObj.month}</td>
+			<td >${useObj.ago}</td>
+			<td >${useObj.now}</td>
+			<td >${useObj.real}</td>
+			<td >${useObj.should}</td>
+			<td >${useObj.fee}</td>
+			<td >${useObj.fund}</td>
+				<td ><a href="javascript:void(0)" onclick="goForUrl()">未缴</a></td>
+		<#-- 	<td >已缴</td> -->
+		</tr>
+		<#else>
+		<tr class="trh" style="color:red">
+			<td >${useObj.month}</td>
+			<td >${useObj.ago}</td>
+			<td >${useObj.now}</td>
+			<td >${useObj.real}</td>
+			<td >${useObj.should}</td>
+			<td >${useObj.fee}</td>
+			<td >${useObj.fund}</td>
+			<td ><a href="javascript:void(0)" onclick="goForUrl()">未缴</a></td>
+		</tr>
+		</#if>
+		</#list>
+		
+	</table>
+	<#else>
+	<table border="1" class="list${obj_index}" indexlist="${obj_index}" indexall="${objList?size}" style="display:none;">
+		<tr>
+			<td colspan="2" bgcolor="#D9D9D9">户号</td>
+			<td colspan="2">${obj.userBindFlow.userNo}</td>
+			<td bgcolor="#D9D9D9">水表卡号</td>
+			<td></td>
+			<td colspan="2"><a  class="next_shuibiao">下一个水表</a></td>
+		</tr>
+		<tr>
+			<td colspan="2" bgcolor="#D9D9D9">户名</td>
+			<td colspan="4">${obj.userBindFlow.userName}</td>
+			<td bgcolor="#D9D9D9">预存款</td>
+			<td>${obj.userBindFlow.rePayFee}</td>
+		</tr>
+		<tr>
+			<td colspan="2" bgcolor="#D9D9D9">地址</td>
+			<td colspan="6" >${obj.userBindFlow.address}</td>
+		</tr>		
+		<#list obj.usedList as useObj>
+		<tr class="trh trbg">
+			<td >月份</td>
+			<td >上期数</td>
+			<td >本期数</td>
+			<td >实抄数</td>
+			<td >应收数</td>
+			<td >金额</td>
+			<td >违约金</td>
+			<td >缴费否</td>
+		</tr>
+		<#if useObj.isPay=="1" || useObj.isPay== 1 >
+		<tr class="trh">
+			<td >${useObj.month}</td>
+			<td >${useObj.ago}</td>
+			<td >${useObj.now}</td>
+			<td >${useObj.real}</td>
+			<td >${useObj.should}</td>
+			<td >${useObj.fee}</td>
+			<td >${useObj.fund}</td>
+			<td >已缴</td>
+		</tr>
+		<#else>
+		<tr class="trh" style="color:red">
+			<td >${useObj.month}</td>
+			<td >${useObj.ago}</td>
+			<td >${useObj.now}</td>
+			<td >${useObj.real}</td>
+			<td >${useObj.should}</td>
+			<td >${useObj.fee}</td>
+			<td >${useObj.fund}</td>
+			<td ><a href="javascript:void(0)" onclick="goForUrl()">未缴</a></td>
+		</tr>
+		</#if>
+		</#list>
+		
+	</table>
+	</#if>
+	 </#list>
+	 
+</div>
+</@layout>

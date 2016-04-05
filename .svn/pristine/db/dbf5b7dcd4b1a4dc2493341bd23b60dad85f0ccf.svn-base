@@ -1,0 +1,155 @@
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : 本地发
+Source Server Version : 50620
+Source Host           : localhost:3306
+Source Database       : wechat_sw
+
+Target Server Type    : MYSQL
+Target Server Version : 50620
+File Encoding         : 65001
+
+Date: 2016-03-18 16:09:12
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for `payrecord`
+-- ----------------------------
+DROP TABLE IF EXISTS `payrecord`;
+CREATE TABLE `payrecord` (
+  `id` int(11) NOT NULL COMMENT '主键ID',
+  `openId` varchar(32) NOT NULL COMMENT '微信ID',
+  `type` int(4) NOT NULL COMMENT '类型1缴费2预存',
+  `userNo` int(8) NOT NULL COMMENT '缴费或者预存的户号',
+  `fee` int(16) DEFAULT '0' COMMENT '金额数量',
+  `userid` int(11) DEFAULT NULL COMMENT 'User表ID 备用字段',
+  `isDelete` int(4) DEFAULT '1' COMMENT '是否删除默认1，不删除；0，删除',
+  `updateTime` datetime DEFAULT NULL COMMENT '更新时间',
+  `isChk` int(4) DEFAULT '0' COMMENT '默认为0,是否对过账，对过则改为1',
+  `remark` varchar(100) DEFAULT NULL COMMENT '订单号',
+  `createTime` datetime DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='充值缴费或者充值预存记录表，一个户号的操作对应一条数据';
+
+-- ----------------------------
+-- Records of payrecord
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `refeeflow`
+-- ----------------------------
+DROP TABLE IF EXISTS `refeeflow`;
+CREATE TABLE `refeeflow` (
+  `id` int(11) NOT NULL,
+  `openid` varchar(32) DEFAULT NULL COMMENT '微信openID（唯一）',
+  `refeeOpenid` varchar(32) DEFAULT NULL COMMENT '推荐人微openID',
+  `Source` tinyint(4) DEFAULT NULL COMMENT '推荐方式（备用）',
+  `isDelete` tinyint(4) DEFAULT NULL COMMENT '是否删除',
+  `updateTime` datetime DEFAULT NULL COMMENT '更新时间',
+  `createTime` datetime DEFAULT NULL COMMENT '创建时间',
+  `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='推荐人绑定表';
+
+-- ----------------------------
+-- Records of refeeflow
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `scoreflow`
+-- ----------------------------
+DROP TABLE IF EXISTS `scoreflow`;
+CREATE TABLE `scoreflow` (
+  `id` int(11) NOT NULL,
+  `userID` int(11) NOT NULL COMMENT 'userID用户表ID',
+  `openID` varchar(32) NOT NULL COMMENT '微信号。该积分消费时的绑定微信号(不能为空）',
+  `type` int(4) NOT NULL DEFAULT '1' COMMENT 'type=1时添加积分type=2时减少积分',
+  `Score` int(11) DEFAULT NULL COMMENT '积分消费值(>0）',
+  `isDelete` int(4) DEFAULT NULL COMMENT '是否删除',
+  `updateTime` datetime DEFAULT NULL COMMENT '更新时间',
+  `createTime` datetime DEFAULT NULL COMMENT '创建时间',
+  `remark` varchar(100) DEFAULT NULL COMMENT '备用字段',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='积分流水记录表';
+
+-- ----------------------------
+-- Records of scoreflow
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `shutoffwaterflow`
+-- ----------------------------
+DROP TABLE IF EXISTS `shutoffwaterflow`;
+CREATE TABLE `shutoffwaterflow` (
+  `id` int(16) NOT NULL AUTO_INCREMENT,
+  `keyword1` varchar(50) NOT NULL COMMENT '停水类型',
+  `keyword2` varchar(100) NOT NULL COMMENT '停水时间',
+  `keyword3` varchar(100) NOT NULL COMMENT '停水区域',
+  `remark` varchar(300) NOT NULL COMMENT '停水说明',
+  `mouldID` varchar(64) DEFAULT NULL COMMENT '模板ID',
+  `url` varchar(64) DEFAULT NULL COMMENT '指向url',
+  `state` tinyint(4) NOT NULL DEFAULT '0' COMMENT '状态，job,默认0:没推送;1:推送中;2推送完成',
+  `createTime` datetime NOT NULL,
+  `updateTime` datetime NOT NULL,
+  `isDelete` tinyint(4) DEFAULT '1' COMMENT '是否删除，不删1，删0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='停水通知记录表';
+
+-- ----------------------------
+-- Records of shutoffwaterflow
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `user`
+-- ----------------------------
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `openid` varchar(32) DEFAULT NULL COMMENT '微信id',
+  `wxName` varchar(30) DEFAULT NULL COMMENT '微信昵称',
+  `type` int(4) NOT NULL COMMENT '1 绑定用户 2后台登录用户',
+  `username` varchar(30) DEFAULT NULL COMMENT '登录名type=2',
+  `password` varchar(64) DEFAULT NULL COMMENT '登录密码type=2',
+  `score` int(16) DEFAULT '0' COMMENT '积分type=1',
+  `IsAdmin` int(4) DEFAULT NULL COMMENT '是否为管理员type=2',
+  `IsAutho` int(4) DEFAULT '0' COMMENT '是否授权（同城易购）type=1',
+  `isDelete` int(4) DEFAULT '1' COMMENT '是否删除',
+  `createTime` datetime DEFAULT NULL,
+  `updateTime` datetime DEFAULT NULL,
+  `remark` varchar(300) DEFAULT NULL COMMENT '备注 type=2时是随机数8位，固定的，登陆用;type=1是微信客户的唯一推荐码',
+  ` isFollow` tinyint(4) NOT NULL DEFAULT '1' COMMENT ' type=1仅且有效是否关注（默认关注1）取消关注0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='user 用户登录 ，或者微信用户关注';
+
+-- ----------------------------
+-- Records of user
+-- ----------------------------
+INSERT INTO `user` VALUES ('6', '666', '小狗', '2', 'superadmin', 'BF83448FF48ABF45B50D86763F0075FD', '0', '0', '0', '1', '2016-01-15 15:19:55', '2016-01-15 15:19:55', 'TpjPLucX', '1');
+INSERT INTO `user` VALUES ('7', '', null, '2', 'admin', 'BF83448FF48ABF45B50D86763F0075FD', '0', null, '0', '1', '2016-01-15 15:19:55', '2016-01-15 15:19:55', 'TpjPLucX', '1');
+
+-- ----------------------------
+-- Table structure for `userbindflow`
+-- ----------------------------
+DROP TABLE IF EXISTS `userbindflow`;
+CREATE TABLE `userbindflow` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `openID` varchar(32) NOT NULL COMMENT '微信号的ID',
+  `rePayFee` int(16) unsigned DEFAULT '0' COMMENT '预存费用',
+  `userNo` int(8) NOT NULL COMMENT '绑定户号',
+  `phoneNum` varchar(11) DEFAULT NULL COMMENT '绑定手机号码',
+  `address` varchar(3000) DEFAULT NULL COMMENT '绑定地址',
+  `userName` varchar(30) DEFAULT NULL COMMENT '绑定姓名',
+  `isBinding` tinyint(4) DEFAULT '1' COMMENT '是否绑定（默认绑定1）解绑0',
+  `createTime` datetime DEFAULT NULL COMMENT '创建时间',
+  `updateTime` datetime DEFAULT NULL COMMENT '更新时间',
+  `isDelete` tinyint(4) DEFAULT '1' COMMENT '是否删除',
+  `remark` varchar(100) DEFAULT NULL COMMENT '保留字段',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='绑定用户的流水表，微信用户的ID和自来水开发号码绑定';
+
+-- ----------------------------
+-- Records of userbindflow
+-- ----------------------------

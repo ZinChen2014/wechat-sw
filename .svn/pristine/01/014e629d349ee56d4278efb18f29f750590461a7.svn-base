@@ -1,0 +1,35 @@
+$(function(){
+	$('input:checkbox').on('change', function(){
+		if($('input:checkbox:checked').val()) {
+			$("#fsubmit").css('display','block');
+		}else{
+			$("#fsubmit").css('display','none');
+		}
+	})
+	
+	$(".next_shuibiao").click(function(){
+		var now = $(this).parents("table").attr("indexlist");
+		if($(this).parents("table").attr("indexall")-1==now){
+			$(".list0").show().siblings().hide();			
+		}else{
+			$(this).parents("table").next("table").show().siblings().hide();
+		}
+	});
+});
+
+function formSubmit() {
+	var money = $("#inmoney").val();
+	if (money == null || $.trim(money) == "") {
+		alert("输入金额");
+		return false;
+	}
+	var re = /^[1-9]+[0-9]*]*$/; 	
+	if (!re.test(money)) {
+		alert("请输入金额到元");		
+		return false;
+	}
+	
+	var f = document.forms[0];
+	window.setTimeout('', 100);
+	f.submit();
+}

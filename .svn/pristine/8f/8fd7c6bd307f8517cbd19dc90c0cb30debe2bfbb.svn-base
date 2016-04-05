@@ -1,0 +1,134 @@
+package com.desksoft.wechat.common.plugin;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
+import com.desksoft.wechat.common.model.PayRecord;
+import com.desksoft.wechat.utils.FileOperation;
+/**
+ * @author Joker
+ * 水务集团的每日对账接口
+ */
+//@Scheduled(fixedDelay=1000*10) // 每10秒
+@Scheduled(cron = "0 0 0 * * ?")  //每天凌晨执行前一天
+public class DailyCheckJob implements Job {
+	
+	private static Logger log = Logger.getLogger(DailyCheckJob.class);
+	
+	
+	
+	@Override
+	public void execute(JobExecutionContext arg0) throws JobExecutionException {
+		
+		//缴费
+		dealPay(1);
+		//充值
+		dealPay(2);
+		
+
+	}
+	
+	public void dealPay(int type){
+		//生成文件
+		createAccountFile();
+		
+		//每次取10条,处理
+		int maxID = 0; 
+		List<PayRecord> list = PayRecord.dao.getPayRecordListById(maxID,type);
+		if(list.size()>0){
+			dealCheckPayRecord(maxID);
+		}
+		//处理文件
+	}
+	
+	public void createAccountFile(){
+		// 银行代码
+		String bankCode = "SZWX01";
+		//
+		// 交易日期
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String time = sdf.format(new Date());
+		File file = new File(bankCode+time+".DZ");
+		file.set
+		try {
+			FileOperation.createFile(fileName);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * 处理一个批次10个支付记录
+	 * 循环
+	 * @param maxID  
+	 * @return flag maxID  Map<String,Object>
+	 */
+	private void dealCheckPayRecord(int maxID){
+		//Map<String,Object> map = new HashMap<String,Object>();
+		List<PayRecord> list = PayRecord.dao.getPayRecordListById(maxID);
+		if(list.size()<=0){
+			//map.put("flag", false);
+			log.info("当日所有账单对账完毕"+System.currentTimeMillis());
+			return;
+		}
+		//处理一个批次10个支付记录
+		try {
+			for(PayRecord payRecord:list){
+				//对账
+				if(checking(payRecord)){
+				//对账完成
+					payRecord.dao.set("isChk", 1);
+				}else{
+				//对账失败
+					log.debug("payRecord id="+payRecord.getId()+",对账失败");
+				}
+			}
+			log.info("成功处理10个"+System.currentTimeMillis());
+		} catch (Exception e) {
+			e.printStackTrace();
+			if(list.size()>0){
+				log.debug(System.currentTimeMillis()+"出现异常，最小id是："+list.get(0).getId());
+			}else{
+				log.debug(System.currentTimeMillis()+"出现异常");
+			}
+			
+		}
+		
+		if(list.size()==10){
+			 PayRecord pr = list.get(list.size()-1);
+			 
+			 if(null!=pr && null!=pr.getId() && pr.getId()>0){
+				 
+				 log.debug("maxID:"+pr.getId());
+				 
+				 //循环
+				 dealCheckPayRecord(pr.getId());
+			 }
+		}
+	}
+	
+	/**
+	 * 调用对账接口
+	 * @param payRecord
+	 * @return
+	 */
+	public boolean checking(PayRecord payRecord){
+		boolean flag = false;
+		//
+		
+		
+		return flag;
+	}
+	
+}

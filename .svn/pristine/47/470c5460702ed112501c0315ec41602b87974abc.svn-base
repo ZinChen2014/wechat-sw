@@ -1,0 +1,102 @@
+<#include "/pages/common/_layout.html"/>
+<@layout>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script type="text/javascript">
+	var HREFURL = "/user/getScoreFlowList/";
+</script>
+  <script src="${CONTEXT_PATH}/js/user/refeeFlow.js"></script>
+    <div class="am-cf am-padding">
+      <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">积分消费</strong> / <small>列表管理</small></div>
+    </div>
+		<div class="am-g">
+		<div class="am-u-sm-12 am-u-md-6">
+		</div>
+		<div class="am-u-sm-12 am-u-md-6">
+			<div class="am-alert am-alert-danger" id="my-alert"
+				style="display: none">
+				<p>开始日期应小于结束日期！</p>
+			</div>
+			<div class="am-g">
+				<div class="am-u-sm-6">
+					<input type="text" id="startDate" class="am-form-field"
+						placeholder="开始日期" data-am-datepicker readonly required />
+				</div>
+				<div class="am-u-sm-6">
+					<input type="text" id="endDate" class="am-form-field"
+						placeholder="结束日期" data-am-datepicker readonly required />
+				</div>
+			</div>
+	
+		</div>
+		<div class="am-u-sm-12 am-u-md-4">
+			<span class="am-u-md-4"> 微信号： </span>
+			<div class="am-input-group am-input-group-sm ">
+				<input type="text" id="userNo" class="am-form-field "> <span
+					class="am-input-group-btn">
+					<button class="am-btn am-btn-default" type="button" id="search">搜索</button>
+				</span>
+			</div>
+		</div>
+	</div>
+	<hr>
+    <div class="am-g">
+       <#if !prjPage?has_content>
+          		 查询没有数据
+            <#else>
+      <div class="am-u-sm-12">
+        <form class="am-form">
+                    <table class="am-table am-table-striped am-table-hover table-main">
+            <thead>
+              <tr>
+                <#-- <th class="table-check"><input type="checkbox" /></th> -->
+                <th class="table-id">ID</th>
+                <th class="table-userID">用户ID</th>
+                <th class="table-openID">用户微信Id</th>
+                 <th class="table-type">类型</th>
+                 <th class="table-score">积分</th>
+                <th class="table-createTime am-hide-sm-only">交易日期</th>
+               <#--  <th class="table-set">操作</th> -->
+              </tr>
+          </thead>
+          <tbody>
+          <#list prjPage.getList() as x>
+            <tr>
+             <#--  <td><input type="checkbox" /></td>-->
+              <td>${x.id}</td>
+              <td>${x.userID}</td>
+              <td>${x.openID}</td>
+               <td><a href="#"><#if x.type=1>
+              	新增
+              <#else>
+              	减少
+              </#if></a></td>
+              <td><a href="#">${x.Score}</a></td>
+              <td class="am-hide-sm-only">${x.createTime}</td>
+                 <#--   
+              <td>
+                <div class="am-btn-toolbar">
+                  <div class="am-btn-group am-btn-group-xs">
+                    <button class="am-btn am-btn-default am-btn-xs am-text-secondary"><span class="am-icon-pencil-square-o"></span> 编辑</button>
+                   <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"> <a href="/user/delBindingUser/${x.id}"><span class="am-icon-trash-o"></span> 删除</a></button>
+                  </div>
+                </div>
+              </td>-->
+            </tr>
+           </#list>
+          </tbody>
+        </table>
+       
+        <#include "/pages/common/_paginate.html" />
+	<@paginate currentPage=prjPage.pageNumber totalPage=prjPage.totalPage
+	 actionUrl="/admin/getScoreFlowList/" 
+	urlParas="&startDate="+startDate+
+	"&openID="+openID+
+	"&endDate="+endDate />
+          <hr />
+        </form>
+      </div>
+</#if>
+    </div>
+  <!-- content end -->
+
+</@layout>

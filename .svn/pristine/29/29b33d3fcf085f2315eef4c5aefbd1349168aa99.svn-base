@@ -1,0 +1,193 @@
+package com.desksoft.wechat.controller.microMsg;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.desksoft.wechat.common.model.UserBindFlow;
+import com.desksoft.wechat.common.model.otherbean.MyWaterInfo;
+import com.desksoft.wechat.common.model.otherbean.WaterUserInfo;
+import com.desksoft.wechat.common.utils.RandomUtil;
+import com.desksoft.wechat.controller.admin.BaseController;
+import com.desksoft.wechat.service.YouPuSocketService;
+import com.jfinal.kit.StrKit;
+
+
+/**
+ * 我的用水 缴费 预存
+ * @author Joker
+ *
+ */
+public class MyUserWaterController extends BaseController {
+	
+//TODO 需要接口
+	/**
+	 * 加载我的用水列表
+	 */
+	public void getUsedWaterList(){
+		String openId = getPara("openId",null);
+		if(StringUtils.isNotBlank(openId)){
+		//	setAttr("openID", openId);
+			List<Map<String,Object>> rlist = new ArrayList<Map<String,Object>>();
+			List<UserBindFlow> list = UserBindFlow.me.selectBindingUserList(openId);
+			for(UserBindFlow userBindFlow:list){
+				 //调用 水务接口，根据openID，找到绑定的所有户号，每个户号去调用接口
+				String userNo = userBindFlow.getUserNo().toString().trim();
+				if(userBindFlow!=null&&StrKit.notBlank(userNo)){
+					String backString = YouPuSocketService.getUserWaterInfo(userNo,null,null);
+					String[] temps = backString.split("\\|");
+					//响应码
+					String ReturnCode  = temps[0].substring(42, 44);
+					if("00".equals(ReturnCode )){
+						Map<String,Object> map = new HashMap<String,Object>();
+						map.put("userNo", userNo);
+						map.put("rePay", temps[2]);
+						map.put("cardID", temps[4]);
+						map.put("userName", temps[5]);
+						map.put("address", temps[6]);
+						int tableN = Integer.valueOf(temps[3]) ;
+						int dataN = Integer.valueOf(temps[7]) ;
+						int add = dataN*8+4+4;
+						//TODO 预存款 还没有呢
+						int d =1;
+						for(int j=4;j<temps.length;j+=add){
+							if(d>tableN){
+								break;
+							}
+							dataN = Integer.valueOf(temps[add+3]) ;
+							List<MyWaterInfo> list2 = new ArrayList<MyWaterInfo>();
+							int k=1;
+							for(int i=add+4;i<temps.length;i+=8){
+								if(k>dataN){
+									break;
+								}
+								MyWaterInfo myWaterInfo = new MyWaterInfo();
+								myWaterInfo.setYearMonth(temps[i]);
+								myWaterInfo.setAgoAmount(temps[i+1]);
+								myWaterInfo.setCurrentAmount(temps[i+2]);
+								myWaterInfo.setAmount(temps[i+3]);
+								myWaterInfo.setMustAmount(temps[i+4]);
+								myWaterInfo.setFee(temps[i+5]);
+								myWaterInfo.setWxFee(temps[i+6]);
+								myWaterInfo.setFlag(temps[i+7]);
+								list2.add(myWaterInfo);
+								k++;
+							}
+						map.put("waterList", list2);
+						d++;
+						}
+						rlist.add(map);	
+					}else{
+						renderText("系统获取数据失败");
+					}
+				}else{
+					renderText("你绑定的户号已经无效");
+				}
+			
+			}
+			
+			if(list.size()>0){
+				setAttr("objList", rlist);
+				render("myUsedWater.html");
+			}else{
+				render("addUser.html");
+			}
+				
+		}else{
+			renderText("非法URL");
+		}
+		
+	}
+	
+	/**
+	 * 缴费 openId查询该用户对应的户号List，依次预存查看
+	 */
+	public void payWater(){
+		String openId = getPara("openId",null);
+		if(StringUtils.isNotBlank(openId)){
+			//setAttr("openID", openId);
+			List<Map<String,Object>> rlist = new ArrayList<Map<String,Object>>();
+			List<UserBindFlow> list = UserBindFlow.me.selectBindingUserList(openId);
+			int i=0;
+			for(UserBindFlow userBindFlow:list){
+				 //TODO 调用 水务接口，根据openID，找到绑定的所有户号，每个户号去调用接口,返回每个用户的欠费情况
+				//Integer userNo = userBindFlow.getUserNo();
+				//假设调用接口，返回用水信息wtMap和一个状态值status:1不欠费，0欠费，欠费就有一个wtMap
+				Map<String,Object> map = new HashMap<String,Object>();
+				if(i==0){
+					Map<String,String> wtMap = new HashMap<String,String>();
+					wtMap.put("num", "12");//笔数
+					wtMap.put("waterFee", "110");//水费
+					wtMap.put("fund", "12");//违约金
+					wtMap.put("total", "133");//总金额
+					map.put("wtMap", wtMap);
+					map.put("status", 0);
+				}else{
+					map.put("status", 1);
+				}
+				//绑定人信息
+				if(StrKit.isBlank(userBindFlow.getUserName())){
+					userBindFlow.setUserName("路人甲"+RandomUtil.getRandomString(4));
+				}
+				if(StrKit.isBlank(userBindFlow.getAddress())){
+					userBindFlow.setAddress("东北路"+RandomUtil.getRandomString(4));
+				}
+				map.put("userBindFlow", userBindFlow);
+				//该用户用水信息
+				rlist.add(map);
+				i++;
+			}
+			
+			if(list.size()>0){
+				setAttr("objList", rlist);
+				render("payWater.html");
+			}else{
+				render("addUser.html");
+			}
+				
+		}else{
+			renderText("非法URL");
+		}
+		
+	}
+	/**
+	 * 水费预存 openId查询该用户对应的户号List，依次预存查看
+	 */
+	public void rePayWater(){
+		String openId = getPara("openId",null);
+		if(StringUtils.isNotBlank(openId)){
+			List<UserBindFlow> list = UserBindFlow.me.selectBindingUserList(openId);
+			int i=0;
+			for(UserBindFlow userBindFlow:list){
+				 //TODO 调用 水务接口，根据openID，找到绑定的所有户号，每个户号去调用接口,返回每个用户的预存信息
+				 //TODO 把预存金额，存入本地预存费用
+				//Integer userNo = userBindFlow.getUserNo();
+				//假设调用接口，返回用水信息预存款 失败给remark赋值
+				if(i==0){
+					long rePayFee = 88;
+					//该用户用水信息预存款
+					userBindFlow.setRePayFee(rePayFee);
+					userBindFlow.setRemark("1");
+				}else{
+					userBindFlow.setRemark("0");
+				}
+				
+				i++;
+			}
+			
+			if(list.size()>0){
+				setAttr("objList", list);
+				render("rePayWater.html");
+			}else{
+				render("addUser.html");
+			}
+				
+		}else{
+			renderText("非法URL");
+		}
+	}
+	
+}

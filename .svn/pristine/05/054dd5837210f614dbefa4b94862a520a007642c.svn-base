@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>Login Page | 嵊州水务微信公众平台</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  	<!--[if lt IE 9]>
+		<script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+		<script src="http://cdn.staticfile.org/modernizr/2.8.3/modernizr.js"></script>
+		<script src="assets/js/amazeui.ie8polyfill.min.js"></script>
+		<![endif]-->
+	
+	<!--[if (gte IE 9)|!(IE)]><!-->
+	<script src="${CONTEXT_PATH}/assets/js/jquery.min.js"></script>
+	<script src="${CONTEXT_PATH}/js/json2.js"></script>
+	<!--<![endif]-->
+  <link rel="alternate icon" type="image/png" href="${CONTEXT_PATH}/assets/i/favicon.png">
+  <link rel="stylesheet" href="${CONTEXT_PATH}/assets/css/amazeui.min.css"/>
+  <style>
+    .header {
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 200%;
+      color: #333;
+      margin-top: 30px;
+    }
+    .header p {
+      font-size: 14px;
+    }
+  </style>
+  <script type="text/javascript">
+  $(function() {
+/* 	  var onlineUserID = $("#onlineUserID").val();
+	  if (typeof(onlineUserID) != "undefined") { 
+		  window.location.href="${CONTEXT_PATH}/index/" ;
+		}    */
+	  
+	  $("#submit").unbind('click').click(function(){
+		  submit();
+	  });
+	  
+	  
+  })
+  function submit(){
+	  if(chklogin()){
+    	  var d ={
+       			  "username":$.trim($('#username').val()),
+       			  "password":$.trim($('#password').val())
+       			 }
+    	  $.ajax({
+           	  dataType : "json",
+                 type : 'post',
+                 data: {"data":JSON.stringify(d)},
+                 url : "${CONTEXT_PATH}/user/login/json",
+                 success : function(obj) {
+               	  alert(obj.msg);
+                     if(true==obj.flag){
+                   	  window.location.href="${CONTEXT_PATH}/index/" ;
+                     }
+                 }
+             });  
+      }else{
+    	  alert("请检查登陆参数")
+      } 
+  }
+  function chklogin(){
+	  var flag = true;
+	  var nowTime = new Date().getTime();
+	    var clickTime =  $("#submit").attr("ctime");
+	    if( clickTime != 'undefined' && (nowTime - clickTime < 5000)){
+	        alert('操作过于频繁，稍后再试');
+	        flag = false;
+	     }else{
+	    	 $("#submit").attr("ctime",nowTime);
+	     }    
+	  
+	  var name = $.trim($('#username').val());
+      var pwd = $.trim($('#password').val());
+      if ("" == name || "" == pwd) {
+          alert('用户名或者密码不能为空');
+          flag = false;
+      } 
+      return flag;
+  }
+  </script>
+</head>
+<body>
+<div class="header">
+  <div class="am-g">
+    <h1>嵊州水务微信公众平台</h1>
+   <!--  <p>powered by szsw<br/>designed by desksoft</p> -->
+  </div>
+  <hr />
+</div>
+<div class="am-g">
+  <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
+    <h3>登录</h3>
+    <hr>
+    <form  class="am-form"> 
+      <label for="username">用户名:</label>
+      <input type="text" id="username" value="">
+      <br>
+      <label for="password">密码:</label>
+      <input type="password"  id="password" value="">
+      <br>
+    <!--     <label for="remember-me">
+        <input id="remember-me" type="checkbox">
+        记住密码
+      </label>  -->
+      <br />
+      <div class="am-cf">
+        <input type="submit" id="submit" name="" value="登 录" class="am-btn am-btn-primary am-btn-sm am-fl">
+        <#-- <input ctime="" type="submit" onclick="submit()"  name="" value="忘记密码 ^_^? " class="am-btn am-btn-default am-btn-sm am-fr"> -->
+      </div>
+      </form>
+    <hr>
+    <p>© 2007-2015 http://www.gooooo.cn/ Inc.,All rights reserved.</p>
+  </div>
+</div>
+</body>
+</html>

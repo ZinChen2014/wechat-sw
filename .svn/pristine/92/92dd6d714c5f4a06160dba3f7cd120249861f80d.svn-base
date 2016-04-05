@@ -1,0 +1,142 @@
+package com.desksoft.wechat.service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class TCPServer {
+
+	// 接口ip
+	private static final String ip = "60.190.200.54";
+
+	// 接口port
+	private static final int port = 8002;
+
+	public static void main(String[] args) {
+		// 户号
+		String userNo = "95108488";
+		// getUserInfoData(userNo);
+		// getUserWaterInfo(userNo,null,null);
+		// getpayData(userNo,null,null);
+		getchkpay(userNo, userNo, userNo, userNo, userNo, userNo, userNo);
+
+	}
+
+	/**
+	 * 
+	 * @param code
+	 *            交易码
+	 * @param length
+	 *            报文体长度
+	 * @return 报文头
+	 */
+	private static String getReportHead(String code, int length) {
+		// 银行代码
+		String bankCode = "SZWX01";
+		//
+		// 交易日期
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String time = sdf.format(new Date());
+		// 报文长度 自动填充12位
+		String strLength = String.format("%012d", length);
+		// 报文头
+		String senderHead = code + bankCode + time + strLength + "000000000000" + "  " + "                  ";
+		System.out.println(senderHead);
+		return senderHead;
+	}
+
+	// 接口调用
+	private static String getSocketCallbackStr(String sendData) {
+
+		String temp = "";
+		byte[] data = sendData.getBytes();
+		Socket socket = null;
+		try {
+			socket = new Socket(ip, port);
+			InputStream in = socket.getInputStream();
+			OutputStream out = socket.getOutputStream();
+			out.write(data);
+			// receive
+			byte[] recdata = new byte[2000];
+			in.read(recdata);
+			System.out.println("recv:" + new String(recdata, "gb2312"));
+			temp = new String(recdata, "gb2312");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (socket != null) {
+					socket.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return temp;
+	}
+
+	// 用户信息查询 1002
+	public static String getUserInfoData(String userNo) {
+		// 交易码
+		String code = "1002";
+		String senderHead = getReportHead(code, userNo.length());
+		String senderStr = senderHead + "|" + userNo;
+		return getSocketCallbackStr(senderStr);
+	}
+
+
+	// 1001缴费申请 ：查询欠费信息
+	public static String getpayData(String userNo, String startDate, String endDate) {
+	 //if(StrKit.isBlank(startDate)){ startDate = "2016-01"; }
+		// 交易码
+		String code = "1001";
+		//报文体
+		String temp = userNo + "|" + startDate + "|" + endDate;
+		// 报文头
+		String senderHead = getReportHead(code, temp.length());
+		String senderStr = senderHead + "|" + temp;
+		System.out.println(senderStr);
+		return getSocketCallbackStr(senderStr);
+	}
+
+	// 1003用水情况 默认是一年 最近一年
+	public static String getUserWaterInfo(String userNo, String startDate, String endDate) {
+		// 交易码
+		String code = "1003";
+		String temp = userNo + "|" + startDate + "|" + endDate;
+		// 报文头
+		String senderHead = getReportHead(code, temp.length());
+		String senderStr = senderHead + "|" + temp;
+		System.out.println(senderStr);
+		return getSocketCallbackStr(senderStr);
+	}
+
+	// 2001 缴费确认
+	public static String getchkpay(String orderNo, String realNumber, String realAddr, String realPay,
+			String realWorkNo, String payDate, String feeID) {
+		// 交易码
+		String code = "2001";
+		orderNo = "A20160103100909-90011116";
+		realNumber = "1";
+		realAddr = "WX";
+		realPay = "31.20";
+		realWorkNo = "9994";
+		payDate = "2016-01-03";
+		feeID = "2816206";
+
+		String temp = orderNo + "|" + realNumber + "|" + realAddr + "|" 
+		+ realPay + "|" + realWorkNo + "|" + payDate + "|" + feeID;
+		
+		// 报文头
+		String senderHead = getReportHead(code, temp.length());
+		String senderStr = senderHead + "|" + temp;
+		return getSocketCallbackStr(senderStr);
+	}
+
+}

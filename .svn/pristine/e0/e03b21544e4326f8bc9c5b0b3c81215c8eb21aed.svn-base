@@ -1,0 +1,48 @@
+
+      <div class="am-u-sm-12">
+        <form class="am-form">
+          <table class="am-table am-table-striped am-table-hover table-main">
+            <thead>
+              <tr>
+                <#-- <th class="table-check"><input type="checkbox" /></th> -->
+                <th class="table-id">ID</th>
+                <th class="table-openID">用户微信Id</th>
+                <th class="table-userNo">户号</th>
+                 <th class="table-userName">户主</th>
+                <th class="table-phoneNum am-hide-sm-only">手机号码</th>
+                 <th class="table-address am-hide-sm-only">地址</th>
+                <th class="table-createTime am-hide-sm-only">绑定日期</th>
+               <#--  <th class="table-set">操作</th> -->
+              </tr>
+          </thead>
+          <tbody>
+          <#list prjPage.getList() as x>
+            <tr>
+             <#--  <td><input type="checkbox" /></td>-->
+              <td>${x.id}</td>
+              <td><a href="#">${x.openID}</a></td>
+              <td>${x.userNo}</td>
+              <td><a href="#">${x.userName}</a></td>
+              <td class="am-hide-sm-only">${x.phoneNum}</td>
+               <td class="am-hide-sm-only"><a href="#">${x.address}</a></td>
+              <td class="am-hide-sm-only">${x.createTime}</td>
+                 <#--   
+              <td>
+                <div class="am-btn-toolbar">
+                  <div class="am-btn-group am-btn-group-xs">
+                    <button class="am-btn am-btn-default am-btn-xs am-text-secondary"><span class="am-icon-pencil-square-o"></span> 编辑</button>
+                   <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"> <a href="/user/delBindingUser/${x.id}"><span class="am-icon-trash-o"></span> 删除</a></button>
+                  </div>
+                </div>
+              </td>-->
+            </tr>
+           </#list>
+          </tbody>
+        </table>
+       
+        <#include "/pages/common/_paginate.html" />
+	<@paginate currentPage=prjPage.pageNumber totalPage=prjPage.totalPage actionUrl="/user/getBindingUserList/" urlParas="-${prjPage.pageNumber}" />
+    
+          <hr />
+        </form>
+      </div>

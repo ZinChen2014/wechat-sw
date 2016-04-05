@@ -1,0 +1,17 @@
+package com.desksoft.wechat.common.plugin;
+
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
+//@Scheduled(fixedDelay=1000*10)  每10秒
+@Scheduled(cron = "0 30 23 * * ?")  //每天23:30执行
+public class DailyCheckJob implements Job {
+
+	@Override
+	public void execute(JobExecutionContext arg0) throws JobExecutionException {
+		System.out.println("老金又拖工资啦");
+
+	}
+
+}

@@ -1,0 +1,10 @@
+package com.desksoft.wechat.common.model;
+
+import com.desksoft.wechat.common.model.base.BaseRefeeflow;
+
+@SuppressWarnings("serial")
+public class ScoreFlow extends BaseRefeeflow<ScoreFlow> {
+	
+	public static final ScoreFlow dao = new ScoreFlow();
+	
+}

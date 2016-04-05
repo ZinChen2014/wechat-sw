@@ -1,0 +1,68 @@
+<#include "/pages/common/_layout.html"/>
+<@layout>
+<title>修改密码</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+ <script type="text/javascript">
+</script>
+<script src="${CONTEXT_PATH}/js/regularExpressionCommon.js"></script>
+   <script src="${CONTEXT_PATH}/js/user/updatePassword.js"></script>
+
+  <!-- content start -->
+    <div class="am-cf am-padding">
+      <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">个人资料</strong> / <small>修改密码</small></div>
+    </div>
+
+    <hr/>
+
+    <div class="am-g">
+
+      <div class="am-u-sm-12 am-u-md-4 am-u-md-push-8">
+     
+      </div>
+
+      <div class="am-u-sm-12 am-u-md-8 am-u-md-pull-4">
+        <form class="am-form am-form-horizontal">
+          <div class="am-form-group">
+            <label for="user-name" class="am-u-sm-3 am-form-label">姓名 / Name</label>
+            <div class="am-u-sm-9">
+              <input type="text" readonly id="user-name" value="${editUser.username}" placeholder="姓名 / Name">
+             <!--  <small>输入你的名字，让我们记住你。</small> -->
+            </div>
+          </div>
+
+          <div class="am-form-group">
+            <label for="user-password" class="am-u-sm-3 am-form-label">原密码 / Password</label>
+            <div class="am-u-sm-9">
+              <input type="password" onblur='pwdOnblur()' id="pwd0" placeholder="输入你的登录密码 / Password">
+              <small>当前的登录密码</small>
+            </div>
+          </div>
+
+           <div class="am-form-group">
+            <label for="user-password" class="am-u-sm-3 am-form-label">新密码 / Password</label>
+            <div class="am-u-sm-9">
+              <input type="password" id="pwd" onblur='pwdOnblur2()' placeholder="输入你的新密码 / Password">
+              <small>新的登录密码</small>
+            </div>
+          </div>
+
+          <div class="am-form-group">
+            <label for="user-password" class="am-u-sm-3 am-form-label">确认密码 / Password</label>
+            <div class="am-u-sm-9">
+              <input type="password" id="pwd2" onblur='pwd2Onblur()' placeholder="再次输入你的新密码 / Password">
+              <small>确认新的登录密码</small>
+            </div>
+          </div>
+        
+
+          <div class="am-form-group">
+            <div class="am-u-sm-9 am-u-sm-push-3">
+              <button type="button" class="am-btn am-btn-primary" id="submit">保存修改</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  <!-- content end -->
+
+</@layout>
